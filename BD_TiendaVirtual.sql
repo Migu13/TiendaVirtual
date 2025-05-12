@@ -8,9 +8,11 @@ CREATE TABLE usuarios (
 
 CREATE TABLE clientes (
     id int AUTO_INCREMENT PRIMARY KEY,
+    usuario VARCHAR(50) NOT NULL,
     nombre varchar(50) NOT null,
+    contraseña VARCHAR(255) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
     apellidos varchar(100) not null,
-    correo varchar(100) UNIQUE not null,
     fecha_nacimiento date,
     genero ENUM('Masculino', 'Femenino', 'Otro')
     );
