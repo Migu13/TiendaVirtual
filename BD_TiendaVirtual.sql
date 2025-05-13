@@ -3,14 +3,14 @@ use tiendavirtual;
 
 CREATE TABLE usuarios (
     usuario varchar(50) PRIMARY KEY,
-    contraseña varchar(100) not null
+    contrasena varchar(100) not null
     );
 
 CREATE TABLE clientes (
     id int AUTO_INCREMENT PRIMARY KEY,
     usuario VARCHAR(50) NOT NULL,
     nombre varchar(50) NOT null,
-    contraseña VARCHAR(255) NOT NULL,
+    contrasena VARCHAR(255) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     apellidos varchar(100) not null,
     fecha_nacimiento date,
