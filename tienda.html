@@ -13,9 +13,8 @@
             </div>
             <nav class="menu">
                 <ul>
-                    <li><a href="Registrarse.html">Registrarse</a></li>
-                    <li><a href="Login.html">Iniciar Sesión</a></li>
-                    <li><a href="Tienda.html">Tienda</a></li>
+                    <li><a href="logout.php">Log-Out</a></li>
+                    <li><a href="#carrito-contenido">Carrito</a></li>
                 </ul>
             </nav>
         </header>
@@ -145,9 +144,12 @@
                 </div>
             </div>
             
-            <div class="carrito">
+            <div class="carrito" id="carrito-contenido">
                 <h2>Tu Carrito</h2>
-                <p>Para ver tu carrito de compras, por favor <a href="Login.html">inicia sesión</a>.</p>
+                <div>
+                    <p>Productos en tu carrito:</p>
+                  
+                </div>
                 <div class="total">
                     <p>Total: $0.00</p>
                     <form action="tienda.php" method="post">
