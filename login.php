@@ -26,16 +26,20 @@ if ($result->num_rows == 1) {
     if (password_verify($contrasena, $row['contrasena'])) {
         $_SESSION['usuario'] = $usuario;
         
-        $sql = "SELECT * FROM clientes WHERE usuario = ?";
+        // Obtener los datos del cliente incluyendo el ID
+        $sql = "SELECT id, nombre, email FROM clientes WHERE usuario = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $usuario);
         $stmt->execute();
         $cliente = $stmt->get_result()->fetch_assoc();
         
+        // Guardar todos los datos importantes en la sesión
+        $_SESSION['usuario_id'] = $cliente['id']; // ESTA LÍNEA ES CRUCIAL
         $_SESSION['nombre'] = $cliente['nombre'];
         $_SESSION['email'] = $cliente['email'];
         
         header("Location: tienda.php");
+        exit();
     } else {
         echo "<script>alert('Contraseña incorrecta.'); window.location.href = 'Login.html';</script>";
     }

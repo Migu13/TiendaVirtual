@@ -34,3 +34,24 @@ INSERT into productos (referencia, nombre, precio) VALUES
 ('PROD008', 'Ratón gaming Logitech', 59.99),
 ('PROD009', 'Altavoz Bluetooth JBL', 79.99),
 ('PROD010', 'Tablet Amazon Fire HD', 149.99);
+
+CREATE TABLE compras (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    fecha_compra DATETIME DEFAULT CURRENT_TIMESTAMP,
+    direccion VARCHAR(255) NOT NULL,
+    ciudad VARCHAR(100) NOT NULL,
+    codigo_postal VARCHAR(20) NOT NULL,
+    total DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (usuario_id) REFERENCES clientes(id)
+);
+
+CREATE TABLE detalles_compra (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    compra_id INT NOT NULL,
+    producto_referencia VARCHAR(20) NOT NULL,
+    cantidad INT NOT NULL,
+    precio_unitario DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (compra_id) REFERENCES compras(id),
+    FOREIGN KEY (producto_referencia) REFERENCES productos(referencia)
+);

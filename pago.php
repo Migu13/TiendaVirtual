@@ -1,16 +1,23 @@
 <?php
 session_start();
 
-if (empty($_SESSION["carrito"])) {
+// Verificar si hay productos en el carrito y si el usuario está logueado
+if (empty($_SESSION["carrito"]) || empty($_SESSION["usuario_id"])) {
     header("Location: tienda.php");
     exit();
 }
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+// Conexión a la base de datos
+$conexion = new mysqli("localhost", "root", "", "tiendavirtual");
+if ($conexion->connect_error) {
+    die("Conexión fallida: " . $conexion->connect_error);
+}
 
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $required_fields = ['tarjeta', 'fecha', 'cvv', 'nombre', 'direccion', 'ciudad', 'cp'];
     $is_valid = true;
     
+    // Validar campos requeridos
     foreach ($required_fields as $field) {
         if (empty($_POST[$field])) {
             $is_valid = false;
@@ -19,12 +26,48 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
     
     if ($is_valid) {
-        header("Location: confirmacion.php");
-        exit();
+        // Calcular total de la compra
+        $total = 0;
+        foreach ($_SESSION["carrito"] as $item) {
+            $total += $item["precio"] * $item["cantidad"];
+        }
+        
+        // Insertar la compra en la tabla compras
+        $stmt = $conexion->prepare("INSERT INTO compras (usuario_id, direccion, ciudad, codigo_postal, total) 
+                                   VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("isssd", $_SESSION["usuario_id"], $_POST["direccion"], 
+                         $_POST["ciudad"], $_POST["cp"], $total);
+        
+        if ($stmt->execute()) {
+            $compra_id = $conexion->insert_id;
+            
+            // Insertar detalles de cada producto en la tabla detalles_compra
+            $stmt_detalle = $conexion->prepare("INSERT INTO detalles_compra 
+                                              (compra_id, producto_referencia, cantidad, precio_unitario) 
+                                              VALUES (?, ?, ?, ?)");
+            
+            foreach ($_SESSION["carrito"] as $item) {
+                $stmt_detalle->bind_param("isid", $compra_id, $item["referencia"], 
+                                         $item["cantidad"], $item["precio"]);
+                $stmt_detalle->execute();
+            }
+            
+            $stmt_detalle->close();
+            
+            // Redirigir a confirmación
+            header("Location: confirmacion.php");
+            exit();
+        } else {
+            $error = "Error al procesar el pago. Por favor intente nuevamente.";
+        }
+        
+        $stmt->close();
     } else {
         $error = "Por favor complete todos los campos requeridos";
     }
 }
+
+$conexion->close();
 ?>
 <!DOCTYPE html>
 <html>
@@ -50,7 +93,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <h1>FINALIZAR COMPRA</h1>
     
     <?php if (isset($error)): ?>
-        <div class="error"><?php echo $error; ?></div>
+        <div class="error" style="color: red; padding: 10px; margin-bottom: 20px; background: #ffeeee; border-radius: 4px;">
+            <?php echo $error; ?>
+        </div>
     <?php endif; ?>
     
     <div class="grid-pago">
