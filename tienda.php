@@ -1,12 +1,10 @@
 <?php
 session_start();
 
-
 $conexion = new mysqli("localhost", "root", "", "tiendavirtual");
 if ($conexion->connect_error) {
     die("Conexión fallida: " . $conexion->connect_error);
 }
-
 
 $imagenes = [
     'Laptop HP Pavilion' => 'imagenes\laptop.jpg',
@@ -20,7 +18,6 @@ $imagenes = [
     'Altavoz Bluetooth JBL' => 'imagenes\altavoz.jpg',
     'Tablet Amazon Fire HD' => 'imagenes\tablet.jpg'
 ];
-
 
 $descripciones = [
     'Laptop HP Pavilion' => 'Potente laptop con procesador Intel Core i7, 16GB RAM, 512GB SSD y pantalla Full HD de 15.6". Ideal para trabajo y entretenimiento.',
@@ -46,15 +43,43 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["producto"])) {
 
     if ($resultado->num_rows > 0) {
         $producto = $resultado->fetch_assoc();
-        $_SESSION["carrito"][] = $producto;
+        
+        
+        if (!isset($_SESSION["carrito"])) {
+            $_SESSION["carrito"] = array();
+        }
+        
+        
+        $encontrado = false;
+        foreach ($_SESSION["carrito"] as &$item) {
+            if ($item["referencia"] === $producto["referencia"]) {
+                $item["cantidad"] += 1;
+                $encontrado = true;
+                break;
+            }
+        }
+        
+        if (!$encontrado) {
+            $producto["cantidad"] = 1;
+            $_SESSION["carrito"][] = $producto;
+        }
     }
 
     $stmt->close();
-
     header("Location: tienda.php");
     exit();
 }
 
+
+if (isset($_GET["eliminar"])) {
+    $indice = $_GET["eliminar"];
+    if (isset($_SESSION["carrito"][$indice])) {
+        unset($_SESSION["carrito"][$indice]);
+        $_SESSION["carrito"] = array_values($_SESSION["carrito"]); 
+    }
+    header("Location: tienda.php");
+    exit();
+}
 
 $sql = "SELECT referencia, nombre, precio FROM productos";
 $resultado = $conexion->query($sql);
@@ -74,7 +99,7 @@ $resultado = $conexion->query($sql);
     <nav class="menu">
         <ul>
             <li><a href="logout.php">Log-Out</a></li>
-            <li><a href="#carrito-contenido">Carrito</a></li>
+            <li><a href="#carrito-contenido">Carrito (<?php echo isset($_SESSION["carrito"]) ? count($_SESSION["carrito"]) : 0; ?>)</a></li>
         </ul>
     </nav>
 </header>
@@ -109,26 +134,29 @@ $resultado = $conexion->query($sql);
     <div class="carrito" id="carrito-contenido">
         <h2>Tu Carrito</h2>
         <div>
-            <p>Productos en tu carrito:</p>
-            <ul>
-                <?php
-                $total = 0.0;
-                if (!empty($_SESSION["carrito"])) {
-                    foreach ($_SESSION["carrito"] as $item) {
-                        echo "<li>" . htmlspecialchars($item["nombre"]) . " - $" . number_format($item["precio"], 2) . "</li>";
-                        $total += $item["precio"];
-                    }
-                } else {
-                    echo "<li>Tu carrito está vacío.</li>";
+            <?php
+            $total = 0.0;
+            if (!empty($_SESSION["carrito"])) {
+                echo '<ul>';
+                foreach ($_SESSION["carrito"] as $indice => $item) {
+                    echo '<li>';
+                    echo htmlspecialchars($item["nombre"]) . " - $" . number_format($item["precio"], 2);
+                    echo " (Cantidad: " . $item["cantidad"] . ")";
+                    echo ' <a href="tienda.php?eliminar=' . $indice . '" class="eliminar">[X]</a>';
+                    echo '</li>';
+                    $total += $item["precio"] * $item["cantidad"];
                 }
-                ?>
-            </ul>
+                echo '</ul>';
+            } else {
+                echo "<p>Tu carrito está vacío.</p>";
+            }
+            ?>
         </div>
         <div class="total">
             <p>Total: $<?php echo number_format($total, 2); ?></p>
-            <form action="tienda.php" method="post">
+            <form action="pago.php" method="get">
                 <input type="submit" class="boton-pagar <?php echo ($total > 0) ? 'habilitado' : ''; ?>" 
-               value="Proceder al pago" <?php echo ($total > 0) ? '' : 'disabled'; ?>>
+                      value="Proceder al pago" <?php echo ($total > 0) ? '' : 'disabled'; ?>>
             </form>
         </div>
     </div>

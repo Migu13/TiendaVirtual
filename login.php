@@ -13,7 +13,7 @@ if ($conn->connect_error) {
 }
 
 $usuario = $_POST['usuario'];
-$contrasena = $_POST['contraseña'];
+$contrasena = $_POST['contrasena'];
 
 $sql = "SELECT * FROM usuarios WHERE usuario = ?";
 $stmt = $conn->prepare($sql);
@@ -23,7 +23,7 @@ $result = $stmt->get_result();
 
 if ($result->num_rows == 1) {
     $row = $result->fetch_assoc();
-    if (password_verify($contrasena, $row['contraseña'])) {
+    if (password_verify($contrasena, $row['contrasena'])) {
         $_SESSION['usuario'] = $usuario;
         
         $sql = "SELECT * FROM clientes WHERE usuario = ?";
@@ -35,7 +35,7 @@ if ($result->num_rows == 1) {
         $_SESSION['nombre'] = $cliente['nombre'];
         $_SESSION['email'] = $cliente['email'];
         
-        header("Location: index.html");
+        header("Location: tienda.php");
     } else {
         echo "<script>alert('Contraseña incorrecta.'); window.location.href = 'Login.html';</script>";
     }

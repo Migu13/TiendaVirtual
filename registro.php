@@ -1,28 +1,28 @@
 <?php
-// Conexión a la base de datos
+
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "tiendavirtual";
 
-// Crear conexión
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Verificar conexión
+
 if ($conn->connect_error) {
     die("Error de conexión: " . $conn->connect_error);
 }
 
-// Recoger datos del formulario
+
 $usuario = $_POST['usuario'];
-$contrasena = password_hash($_POST['contraseña'], PASSWORD_DEFAULT);
+$contrasena = password_hash($_POST['contrasena'], PASSWORD_DEFAULT);
 $email = $_POST['email'];
 $nombre = $_POST['nombre'];
 $apellidos = $_POST['apellidos'];
 $fecha_nacimiento = $_POST['fecha_nacimiento'];
 $genero = $_POST['genero'];
 
-// Verificar si el usuario ya existe
+
 $sql = "SELECT * FROM usuarios WHERE usuario = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $usuario);
@@ -34,7 +34,7 @@ if ($result->num_rows > 0) {
     exit();
 }
 
-// Verificar si el email ya existe
+
 $sql = "SELECT * FROM clientes WHERE email = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $email);
@@ -46,13 +46,13 @@ if ($result->num_rows > 0) {
     exit();
 }
 
-// Insertar en la tabla usuarios
+
 $sql = "INSERT INTO usuarios (usuario, `contrasena`) VALUES (?, ?)";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ss", $usuario, $contrasena);
 
 if ($stmt->execute()) {
-    // Insertar en la tabla clientes
+    
     $sql = "INSERT INTO clientes (usuario, nombre, `contrasena`, email, apellidos, fecha_nacimiento, genero) 
             VALUES (?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
