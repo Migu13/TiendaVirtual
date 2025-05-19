@@ -21,7 +21,7 @@ unset($_SESSION["carrito"]);
 <head>
     <meta charset="UTF-8">
     <title>Compra Exitosa - TechZone</title>
-    <link rel="stylesheet" href="confirmacion.css">
+    <link rel="stylesheet" href="Estilos/confirmacion.css">
 </head>
 <body>
 <header>

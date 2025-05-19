@@ -1,13 +1,13 @@
 <?php
 session_start();
 
-// Verificar si hay productos en el carrito y si el usuario está logueado
+
 if (empty($_SESSION["carrito"]) || empty($_SESSION["usuario_id"])) {
     header("Location: tienda.php");
     exit();
 }
 
-// Conexión a la base de datos
+
 $conexion = new mysqli("localhost", "root", "", "tiendavirtual");
 if ($conexion->connect_error) {
     die("Conexión fallida: " . $conexion->connect_error);
@@ -17,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $required_fields = ['tarjeta', 'fecha', 'cvv', 'nombre', 'direccion', 'ciudad', 'cp'];
     $is_valid = true;
     
-    // Validar campos requeridos
+    
     foreach ($required_fields as $field) {
         if (empty($_POST[$field])) {
             $is_valid = false;
@@ -26,13 +26,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
     
     if ($is_valid) {
-        // Calcular total de la compra
+       
         $total = 0;
         foreach ($_SESSION["carrito"] as $item) {
             $total += $item["precio"] * $item["cantidad"];
         }
         
-        // Insertar la compra en la tabla compras
+        
         $stmt = $conexion->prepare("INSERT INTO compras (usuario_id, direccion, ciudad, codigo_postal, total) 
                                    VALUES (?, ?, ?, ?, ?)");
         $stmt->bind_param("isssd", $_SESSION["usuario_id"], $_POST["direccion"], 
@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if ($stmt->execute()) {
             $compra_id = $conexion->insert_id;
             
-            // Insertar detalles de cada producto en la tabla detalles_compra
+            
             $stmt_detalle = $conexion->prepare("INSERT INTO detalles_compra 
                                               (compra_id, producto_referencia, cantidad, precio_unitario) 
                                               VALUES (?, ?, ?, ?)");
@@ -54,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             
             $stmt_detalle->close();
             
-            // Redirigir a confirmación
+            
             header("Location: confirmacion.php");
             exit();
         } else {
@@ -74,7 +74,7 @@ $conexion->close();
 <head>
     <meta charset="UTF-8">
     <title>Pago - TechZone</title>
-    <link rel="stylesheet" href="pago.css">
+    <link rel="stylesheet" href="Estilos/pago.css">
 </head>
 <body>
 <header>

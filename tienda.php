@@ -88,7 +88,7 @@ $resultado = $conexion->query($sql);
 <html>
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="tienda.css">
+    <link rel="stylesheet" href="Estilos/tienda.css">
     <title>TechZone - Tienda</title>
 </head>
 <body>
