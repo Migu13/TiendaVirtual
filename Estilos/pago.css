@@ -155,16 +155,9 @@ h1 {
     font-weight: bold;
     cursor: pointer;
     margin-top: 10px;
-    transition: background 0.3s;
 }
 
 .boton-pagar:hover {
     background-color: #0085c7;
 }
 
-
-@media (max-width: 768px) {
-    .grid-pago {
-        grid-template-columns: 1fr;
-    }
-}
